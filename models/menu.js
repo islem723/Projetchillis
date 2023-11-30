@@ -1,20 +1,32 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 //utiliser schema et model du module mongoose
 const { Schema, model } = mongoose;
 
-const menuSchema = new Schema({
-  platname: { type: String, required: true },
+export default model(
+    'menu',
+    new Schema({
+        platname: {
+            type: String,
+            required: true,
+            trim: true,
+        },
 
-  title: { type: String },
+        plateType: {
+            type: String,
+            required: true,
+            trim: true,
+        },
 
-  image: {
-    type: String,
-  },
-  
-  price: {
-    type: Number,
-  },
-});
+        image: {
+            type: String,
+            required: true,
+            trim: true,
+        },
 
-export default model("menu", menuSchema);
+        price: {
+            type: Number,
+            required: true,
+        },
+    })
+);

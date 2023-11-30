@@ -14,7 +14,7 @@ export default function (req, file) {
         storage: diskStorage({
             destination: (req, file, callback) => {
                 const _dirname = dirname(fileURLToPath(import.meta.url));
-                callback(null, join(_dirname, `../public/images`));
+                callback(null, join(_dirname, `../upload/images`));
             },
             filename: (req, file, callback) => {
                 // const extension = MIME_TYPES[file.mimetype]
