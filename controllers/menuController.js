@@ -31,13 +31,31 @@ export async function deleteplat(req, res) {
     try {
         const { _id } = req.params;
 
+        const found = await menu.findOne({ _id: _id });
+
+        if (!found) {
+            return res.status(404).json({ error: 'Plate not found!' });
+        }
+
+        const imageName = found.image;
+
         const deletedMenu = await menu.deleteOne({ _id: _id });
 
         if (!deletedMenu.deletedCount) {
             return res.status(404).send({ error: 'Menu not found' });
         }
 
-        return res.status(200).send({ menu: 'success', deletedMenu });
+        deletImage(imageName, (err) => {
+            if (err) {
+                return res
+                    .status(500)
+                    .json({ error: 'Could not delete the palte image!' });
+            }
+
+            return res.status(200).json({
+                message: 'Plate deleted successfully!',
+            });
+        });
     } catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Internal Server Error' });
@@ -87,18 +105,39 @@ export async function upatePlate(req, res) {
 
 export async function deleteAllplats(req, res) {
     try {
+        let delCount = 0;
+
+        const platesImages = (await menu.find({}, { image: 1 })).map(
+            (p) => p.image
+        );
+
+        platesImages.forEach(function (plate) {
+            deletImage(plate.image, function (err) {
+                if (err) {
+                    return res.status(500).json({ error: err });
+                }
+            });
+            delCount++;
+        });
+
+        if (!delCount) {
+            return res
+                .status(500)
+                .json({ error: 'Could not delete the paltes images!' });
+        }
+
         const result = await menu.deleteMany({});
 
-        if (result.deletedCount === 0) {
+        if (!result.deletedCount) {
             return res.status(200).send({ error: 'No data to delete' });
         }
 
         return res
             .status(200)
-            .send({ message: 'All plates have been deleted' });
+            .json({ message: 'All plates have been deleted' });
     } catch (error) {
         console.error(error);
-        return res.status(500).send({ error: 'Internal Server Error' });
+        return res.status(500).json({ error: error });
     }
 }
 
