@@ -1,19 +1,33 @@
 import menu from '../models/menu.js';
+
+import PlateCatModel from '../models/plateCategory.js';
 import deletImage from '../services/imageDel.js';
 
 export async function addplat(req, res) {
     try {
-        const { platname, price, plateType } = req.body;
+        const { categoryName } = req.query;
+
+        const category = await PlateCatModel.findOne({
+            categoryName: categoryName,
+        });
+
+        if (!category) {
+            return res.status(404).json({ error: 'Category not found!' });
+        }
+
+        const { platname, price } = req.body;
 
         const plat = await menu.create({
             platname: platname,
             price: price,
-            plateType: plateType,
+            plateCategory: category,
             image: `${req.file.filename}`,
         });
+
         if (!plat) {
             return res.status(400).json({ error: 'error adding plate' });
         }
+
         return res.status(201).json({
             message: ' Your Plate Added Successfully!',
         });
@@ -21,10 +35,47 @@ export async function addplat(req, res) {
         console.error(err);
         res.status(400).json({ error: 'error adding ' });
     }
-}
+} // lezmna n3mlou get plats by category name w get plates per category (group by category y3ni)
 
 export async function getAllplats(req, res) {
     return res.send(await menu.find({}));
+}
+
+export async function getAllplatsByCategoryName(req, res) {
+    const { categoryName } = req.query;
+
+    const category = await PlateCatModel.findOne({
+        categoryName: categoryName,
+    });
+
+    if (!category) {
+        return res.status(404).json({ error: 'Category Not Found!' });
+    }
+
+    const allPlates = await menu
+        .find({ plateCategory: category }, { __v: 0 })
+        .populate('plateCategory');
+
+    return res.send(
+        allPlates.filter((a) => a.plateCategory.categoryName === categoryName)
+    );
+}
+
+export async function getAllplatsGroupByCategory(req, res) {
+    const categories = await PlateCatModel.find({});
+    let mealsByCategory = {};
+
+    for (const c of categories) {
+        const meals = await menu
+            .find({ plateCategory: c }, { __v: 0 })
+            .limit(6);
+
+        if (meals.length > 0) {
+            mealsByCategory[c.categoryName] = meals;
+        }
+    }
+
+    return res.send(mealsByCategory);
 }
 
 export async function deleteplat(req, res) {
@@ -74,7 +125,7 @@ export async function getOnceplat(req, res) {
 
 export async function upatePlate(req, res) {
     const { id } = req.params;
-    const { platname, price, plateType } = req.body;
+    const { platname, price } = req.body;
     const plate = await menu.findOne({ _id: id });
 
     if (!plate) {
@@ -89,7 +140,6 @@ export async function upatePlate(req, res) {
             $set: {
                 platname: platname,
                 price: price,
-                plateType: plateType,
             },
         },
         {

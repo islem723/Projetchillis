@@ -7,6 +7,8 @@ import {
     getAllplats,
     upatePlate,
     updatePhotoPlate,
+    getAllplatsByCategoryName,
+    getAllplatsGroupByCategory,
 } from '../controllers/menuController.js';
 
 import multer from '../middlewares/storage.js';
@@ -22,6 +24,10 @@ router.route('/deleteAllplats').delete(deleteAllplats);
 router.route('/addplat').post(multer(), addplat);
 
 router.route('/deleteplat/:_id').delete(deleteplat);
+
+router.route('/getByCategoryName').get(getAllplatsByCategoryName);
+
+router.route('/getMealsGrouped').get(getAllplatsGroupByCategory);
 
 router.route('/updatePlat/:id').put(upatePlate);
 

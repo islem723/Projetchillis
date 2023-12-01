@@ -11,22 +11,19 @@ export default model(
             required: true,
             trim: true,
         },
-
-        plateType: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-
         image: {
             type: String,
             required: true,
             trim: true,
         },
-
         price: {
             type: Number,
             required: true,
+        },
+        plateCategory: {
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: 'plateCategory',
         },
     })
 );
