@@ -1,2 +1,2 @@
-export const API_URL = "http://localhost:3000";
+export const API_URL = "http://localhost:5000";
 export const MENU_URL = `${API_URL}/menu`;

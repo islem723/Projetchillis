@@ -117,7 +117,7 @@ const Tables = () => {
     });
   }
 
-  async function SendDelete() {
+  async function SendDeleteAll() {
     const resp = await fetch(`${MENU_URL}/deleteAllplats`, {
       method: "DELETE",
     });
@@ -131,7 +131,7 @@ const Tables = () => {
     });
   }
 
-  async function SendDeleteAll() {
+  async function SendDelete() {
     const resp = await fetch(`${MENU_URL}/deleteplat/${selectedMeal._id}`, {
       method: "DELETE",
     });
